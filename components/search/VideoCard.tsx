@@ -36,6 +36,28 @@ export const VideoCard = memo<VideoCardProps>(({
     resolution,
     isProbing = false,
 }) => {
+
+    // --- 新增拦截逻辑：只要包含以下关键词，直接返回空，不渲染任何内容 ---
+    const blacklist = ['韩国', '韩语', '韓國', '韓語'];
+    
+    // 获取所有可能代表地域或语言的字段
+    const name = video.vod_name || '';
+    const type = video.type_name || '';
+    const area = video.vod_area || ''; // 接口常见的地区字段
+    const lang = video.vod_lang || ''; // 对应你代码底部的 vod_lang
+
+    const isKorean = blacklist.some(key => 
+        name.includes(key) || 
+        type.includes(key) || 
+        area.includes(key) || 
+        lang.includes(key)
+    );
+
+    if (isKorean) {
+        return null; // 命中黑名单，直接人间蒸发
+    }
+    // --- 拦截逻辑结束 ---
+    
     const displayLatency = latencies[video.source] ?? video.latency;
     return (
         <div
