@@ -42,27 +42,12 @@ async function searchVideosBySource(
             throw new Error(data.msg || 'Invalid API response');
         }
 
-        // const results: VideoItem[] = (data.list || []).map(item => ({
-        //     ...item,
-        //     source: source.id,
-        // }));
+        const results: VideoItem[] = (data.list || []).map(item => ({
+            ...item,
+            source: source.id,
+        }));
 
-        // 过滤掉地区包含“韩国”或分类包含“韩国”的资源
-        const results: VideoItem[] = (data.list || [])
-            .filter(item => {
-                const area = item.vod_area || '';
-                const type = item.type_name || '';
-                const name = item.vod_name || '';
-                
-                // 如果包含“韩国”或“韩语”关键词，则返回 false (排除)
-                return !area.includes('韩国') && 
-                       !type.includes('韩国') && 
-                       !name.includes('韩语');
-            })
-            .map(item => ({
-                ...item,
-                source: source.id,
-            }));
+
 
         return {
             results,
