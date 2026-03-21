@@ -37,24 +37,27 @@ export const VideoCard = memo<VideoCardProps>(({
     isProbing = false,
 }) => {
 
-    // --- 新增拦截逻辑：只要包含以下关键词，直接返回空，不渲染任何内容 ---
-    const blacklist = ['韩国', '韩语', '韓國', '韓語'];
-    
-    // 获取所有可能代表地域或语言的字段
+   // --- 强制拦截逻辑：检测任何韩文字符 ---
+    // 这个正则表达式可以匹配到任何韩文字母
+    const koreanRegex = /[\uac00-\ud7af]/;
+
+    // 检查所有可能包含韩文信息的字段
     const name = video.vod_name || '';
     const type = video.type_name || '';
     const area = video.vod_area || ''; // 接口常见的地区字段
-    const lang = video.vod_lang || ''; // 对应你代码底部的 vod_lang
+    const lang = video.vod_lang || ''; // 语种
+    const remarks = video.vod_remarks || ''; // 备注（比如写着“韩语中字”）
 
-    const isKorean = blacklist.some(key => 
-        name.includes(key) || 
-        type.includes(key) || 
-        area.includes(key) || 
-        lang.includes(key)
-    );
+    // 只要有一个字段包含任何韩文字符，或者包含“韩”字，就强制排除
+    const isKorean = 
+        koreanRegex.test(name) || name.includes('韩') ||
+        koreanRegex.test(type) || type.includes('韩') ||
+        koreanRegex.test(area) || area.includes('韩') ||
+        koreanRegex.test(lang) || lang.includes('韩') ||
+        koreanRegex.test(remarks) || remarks.includes('韩');
 
     if (isKorean) {
-        return null; // 命中黑名单，直接人间蒸发
+        return null; // 这里最核心！不渲染它，让它在界面上完全消失
     }
     // --- 拦截逻辑结束 ---
     
