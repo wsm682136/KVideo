@@ -37,30 +37,6 @@ export const VideoCard = memo<VideoCardProps>(({
     isProbing = false,
 }) => {
 
-   // --- 强制拦截逻辑：检测任何韩文字符 ---
-    // 这个正则表达式可以匹配到任何韩文字母
-    const koreanRegex = /[\uac00-\ud7af]/;
-
-    // 检查所有可能包含韩文信息的字段
-    const name = video.vod_name || '';
-    const type = video.type_name || '';
-    const area = video.vod_area || ''; // 接口常见的地区字段
-    const lang = video.vod_lang || ''; // 语种
-    const remarks = video.vod_remarks || ''; // 备注（比如写着“韩语中字”）
-
-    // 只要有一个字段包含任何韩文字符，或者包含“韩”字，就强制排除
-    const isKorean = 
-        koreanRegex.test(name) || name.includes('韩') ||
-        koreanRegex.test(type) || type.includes('韩') ||
-        koreanRegex.test(area) || area.includes('韩') ||
-        koreanRegex.test(lang) || lang.includes('韩') ||
-        koreanRegex.test(remarks) || remarks.includes('韩');
-
-    if (isKorean) {
-        return null; // 这里最核心！不渲染它，让它在界面上完全消失
-    }
-    // --- 拦截逻辑结束 ---
-    
     const displayLatency = latencies[video.source] ?? video.latency;
     return (
         <div
